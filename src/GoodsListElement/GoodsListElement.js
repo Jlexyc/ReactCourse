@@ -1,22 +1,59 @@
-import React, { Component } from 'react'
-import './GoodsListElement.css'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import './GoodsListElement.css';
 
 export default class GoodsListElement extends Component {
-    onDelete = (e) => {
-        this.props.onDelete(this.props.good.id)
-    }
+    state = {
+        change: false
+    };
 
     render() {
-        const { title, weight, description } = this.props.good
+
+        const { title, weight, description, value } = this.props.good
+        const { onCounter, onDelete, getId } = this.props
+
+        let className = 'GoodsListElement';
+        let changeValue = value;
+
+        if(value === 'important') {
+            className += ` ${value}`
+            changeValue = 'Important'
+        } else {
+            className = 'GoodsListElement'
+            changeValue = 'Not important'
+        }
+
         return (
-            <div className="GoodsListElement">
-                <div className="GoodsListElement_Column">{title}</div>
-                <div className="GoodsListElement_Column">{weight}</div>
-                <div className="GoodsListElement_Column GoodsListElement_ColumnDescription">{description}</div>
-                <div className="GoodsListElement_Column GoodsListElement_Button">
-                    <button onClick={this.onDelete}>Delete</button>
+            <React.Fragment>
+                <h2>{changeValue}</h2>
+                <div className={className} >
+                <input type="checkbox" onClick={onCounter} />
+                    <div className="GoodsListElement_Column">
+                        {title}
+                    </div>
+                    <div className="GoodsListElement_Column">
+                        {weight}
+                    </div>
+                    <div className="GoodsListElement_Column GoodsListElement_ColumnDescription">
+                        {description}
+                    </div>
+                    <div className="GoodsListElement_Column GoodsListElement_Button">
+                        <button onClick={getId}>Change</button>
+                        <button onClick={onDelete}>Delete</button>
+                    </div>
                 </div>
-            </div>
+            </React.Fragment>
         )
     }
 }
+
+GoodsListElement.propTypes = {
+    good: PropTypes.object,
+    onDelete: PropTypes.func,
+    onCounter: PropTypes.func,
+    getId: PropTypes.func,
+}
+
+
+
