@@ -6,7 +6,8 @@ export default class GoodsListForm extends Component {
     state = {
         title: '',
         weight: '',
-        description: ''
+        description: '',
+        isSelected: false,
     }
 
     onFormSubmit = (e) => {
@@ -15,11 +16,18 @@ export default class GoodsListForm extends Component {
         this.setState({
             title: '',
             weight: '',
-            description: ''
+            description: '',
+            isSelected: false,
         })
     }
 
     onInputChange = ({ target }) => {
+        if (target.name == 'weight'){
+            const float_re = /^\d+\.?(\d+)?$/
+            if (!float_re.test(target.value)){
+                target.value = this.state.weight
+            }
+        }
         this.setState({
             [target.name]: target.value
         })
