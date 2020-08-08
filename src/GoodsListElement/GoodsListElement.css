@@ -1,16 +1,28 @@
 .GoodsListElement {
     border-bottom: 0.5px solid black;
-    margin: 0 10px 0 10px;
+    margin: 0 10px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 .GoodsListElement_Column {
     text-align: left;
-    width: 8%;
 }
-.GoodsListElement_ColumnDescription{
+
+.GoodsListElement_Column_Title {
+    width: 20%;
+}
+
+.GoodsListElement_Column_Weight {
+    width: 10%;
+}
+
+.GoodsListElement_Column_Description{
     width: 30%;
+}
+
+.GoodsListElement_Column_Category {
+    width: 20%;
 }
 
 .GoodsListElement_Button{

@@ -1,0 +1,15 @@
+.Total {
+  border-bottom: 0.5px solid black;
+  margin: 5px 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+.Total_Title {
+  width: 40%;
+  text-align: left;
+}
+
+.Total_Weight {
+  text-align: center;
+}
