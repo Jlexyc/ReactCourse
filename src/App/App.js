@@ -1,103 +1,94 @@
-import React, { Component } from 'react';
-import './App.css';
+import React, { useState, useCallback } from 'react'
+
+import './App.css'
 
 import GoodsList from '../GoodsList/GoodsList';
-import { goods } from '../Mocks/GoodsMock';
+import { goods as goodsMock } from '../Mocks/GoodsMock';
 import GoodsListForm from '../GoodsListForm/GoodsListForm';
 import { addNewItem, removeElementById, getTotal, getGoodsBySelected }
   from '../Utils/goodsUtils';
 import {categories} from '../Mocks/CategoriesMock';
 import __ from '../Utils/translationsUtils';
 
-export default class App extends Component {
-  constructor(props) {
-    super(props);
+export default function App(props) {
 
-    this.state = {
-      goods,
-      selectedGoods: [],
-      total: getTotal(goods),
-      subTotal: 0,
-    };
+    const [goods, setGoods] = useState(goodsMock);    
+    const [total, setTotal] = useState(getTotal(goodsMock));
+    const [subTotal, setSubtotal] = useState(0);
+    const [selectedGoods, setSelectedGoods] = useState([]);
 
-    this.onAdd = (newElement) => {
-      this.setState(({goods}) => {
-        const newArray = addNewItem(newElement, goods);
-        return {
-          goods: newArray,
-          total: getTotal(newArray),
-        };
-      });
-    };
-
-    this.onDelete = (id) => {
-      const newArray = removeElementById(id, this.state.goods);
-      this.setState({
-        goods: newArray,
-        total: getTotal(newArray),
-      });
-    };
-
-    this.onElementToggle = (id) => {
-      this.setState(({ goods, selectedGoods }) => {
-        const idx = selectedGoods.findIndex((itemId) => itemId === id);
-        const shallowSelectedGoodsCopy = [...selectedGoods];
-
-        if (idx >= 0) {
-          shallowSelectedGoodsCopy.splice(idx, 1);
-        } else {
-          shallowSelectedGoodsCopy.push(id);
+    const onDelete = useCallback(
+        (id) => {
+            const newArray = removeElementById(id, goods);
+            setGoods(newArray)
+            setTotal(getTotal(newArray))
         }
+        ,[goods]
+    )
 
-        return {
-          selectedGoods: shallowSelectedGoodsCopy,
-          subTotal: getTotal(goods.filter((item) => {
-            return shallowSelectedGoodsCopy.indexOf(item.id) >= 0;
-          })),
-        };
-      });
-    };
+    const onDeleteSelected = useCallback(
+        () => {
+            const deselectedGoods = getGoodsBySelected(goods, selectedGoods, false);
+            setGoods(deselectedGoods)
+            setSelectedGoods([])
+            setSubtotal(0)
+            setTotal(getTotal(deselectedGoods))
+        }
+        ,[goods, selectedGoods]
+    )
 
-    this.onElementUpdate = (id, data = {}) => {
-      this.setState(({ goods, selectedGoods }) => {
-        const idx = goods.findIndex((item) => item.id === id);
-        const newGoods = [...goods];
-        newGoods[idx] = {id, ...data};
+    const onAdd = useCallback(
+        (newElement) => {
+            const newArray = addNewItem(newElement, goods);
+            setGoods(goods)
+            setTotal(getTotal(newArray))
+          }
+        ,[goods]
+    )
 
-        return {
-          goods: newGoods,
-          total: getTotal(newGoods),
-          subTotal: getTotal(getGoodsBySelected(newGoods, selectedGoods)),
-        };
-      });
-    };
-    this.onDeleteSelected = () => {
-      this.setState(({ selectedGoods, goods }) => {
-        const deselectedGoods = getGoodsBySelected(goods, selectedGoods, false);
+    const onElementToggle = useCallback(
+        (id) => {
+            const idx = selectedGoods.findIndex((itemId) => itemId === id);
+            const shallowSelectedGoodsCopy = [...selectedGoods];
+    
+            if (idx >= 0) {
+              shallowSelectedGoodsCopy.splice(idx, 1);
+            } else {
+              shallowSelectedGoodsCopy.push(id);
+            }
+    
+            setGoods(goods)
+            setSubtotal(setSubtotal(goods.filter((item) => {
+                return shallowSelectedGoodsCopy.indexOf(item.id) >= 0;
+              })))
+        }
+        ,[goods, selectedGoods]
+    )
 
-        return {
-          goods: deselectedGoods,
-          selectedGoods: [],
-          subTotal: 0,
-          total: getTotal(deselectedGoods),
-        };
-      });
-    };
-  }
+    const onElementUpdate = useCallback(
+        (id, data = {}) => {
 
-  render() {
-    const { total, subTotal, goods, selectedGoods } = this.state;
+            const idx = goods.findIndex((item) => item.id === id);
+            const newGoods = [...goods];
+            newGoods[idx] = {id, ...data};
+            
+            setGoods(newGoods);
+            setTotal(getTotal(newGoods));
+            setSubtotal(getTotal(getGoodsBySelected(newGoods, selectedGoods)));
+          }
+        ,[goods, selectedGoods]
+    )
 
     return (
-      <div className="Container">
+        <div className="Container">
         <div className="Title">{ __('Fridge') }</div>
         <GoodsList
           goods={ goods }
           categories={ categories }
           selectedItems={ selectedGoods }
-          onDelete={this.onDelete}
-          onElementToggle={ this.onElementToggle }
-          onElementUpdate={ this.onElementUpdate }
+          onDelete={ onDelete }
+          onElementToggle={ onElementToggle }
+          onElementUpdate={ onElementUpdate }
         />
         <div className="Total">
           <div>{__('Total')}:</div>
@@ -107,12 +98,11 @@ export default class App extends Component {
           }</div>
         </div>
         { !!selectedGoods.length && (
-          <button onClick={ this.onDeleteSelected }>
+          <button onClick={ onDeleteSelected }>
             { __('Delete Selected') }
           </button>
         ) }
-        <GoodsListForm onAdd={this.onAdd} categories={ categories } />
+        <GoodsListForm onAdd={onAdd} categories={ categories } />
       </div>
-    );
-  }
+    )
 }

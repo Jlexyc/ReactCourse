@@ -1,13 +1,16 @@
-import React from 'react'
+import React, { Component } from 'react';
 import GoodsListElement from '../GoodsListElement/GoodsListElement';
 import PropTypes from 'prop-types';
 
-export default function GoodsList(props) {
+export default class GoodsList extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-    const { goods, categories, selectedItems, onElementToggle, onElementUpdate, onDelete } = props;
-
+  render() {
+    const { goods, categories, selectedItems, onElementToggle, onDelete, onElementUpdate } = this.props;
     return (
-        <div>
+      <div>
         {Array.isArray(goods) && goods.map( (item) => {
           const selected = selectedItems.indexOf(item.id) >= 0;
           return (
@@ -23,20 +26,20 @@ export default function GoodsList(props) {
           );
         })}
       </div>
-    )
+    );
+  }
 }
 
 GoodsList.defaultProps = {
-    goods: [],
-    selectedItems: [],
-  };
-  
-GoodsList.propTypes = {
-    goods: PropTypes.array,
-    categories: PropTypes.array,
-    selectedItems: PropTypes.array,
-    onDelete: PropTypes.func,
-    onElementToggle: PropTypes.func,
-    onElementUpdate: PropTypes.func,
+  goods: [],
+  selectedItems: [],
 };
-  
+
+GoodsList.propTypes = {
+  goods: PropTypes.array,
+  categories: PropTypes.array,
+  selectedItems: PropTypes.array,
+  onDelete: PropTypes.func,
+  onElementToggle: PropTypes.func,
+  onElementUpdate: PropTypes.func,
+};
