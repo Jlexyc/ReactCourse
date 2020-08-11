@@ -16,3 +16,6 @@
 .GoodsListElement_Button{
     width: 12%;
 }
+.GoodsListElementGrey {
+    background-color:grey;
+}
