@@ -1,0 +1,7 @@
+.Counter {
+    border-bottom: 0.5px solid black;
+    margin: 0 10px 0 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

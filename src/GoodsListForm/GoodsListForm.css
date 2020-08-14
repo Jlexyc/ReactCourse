@@ -1,4 +1,5 @@
 .GoodsListForm {
+    display: inline-block;
     display: flex;
     flex-direction: column;
     text-align: left;
@@ -18,4 +19,16 @@
     width: 20%;
     text-align: center;
     justify-content: center;
+}
+
+.cell {
+    width: 50%;
+}
+
+.cell select {
+    width: 15%;
+}
+
+.warning {
+    border: 2px solid yellow;
 }

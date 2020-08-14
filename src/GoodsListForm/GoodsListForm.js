@@ -1,62 +1,103 @@
-import React, { Component } from 'react'
-import './GoodsListForm.css'
+import React, { useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
 
-export default class GoodsListForm extends Component {
+import './GoodsListForm.css';
 
-    state = {
+import { downDropList } from '../Mocks/GoodsMock'
+
+export default function GoodsListForm({ onAdd }) {
+
+    const [form, setForm] = useState({
         title: '',
         weight: '',
-        description: ''
-    }
+        description: '',
+        value: 'important',
+    })
 
-    onFormSubmit = (e) => {
+    const onFormSubmit = useCallback(
+        (e) => {
         e.preventDefault()
-        this.props.onAdd(this.state)
-        this.setState({
+        if (form.weight === '') {
+            alert('you have to put a number in cell description ')
+            setForm({
+                title: '',
+                weight: '',
+                description: '',
+                value: 'important'
+            })
+        }
+        onAdd(form)
+        setForm({
             title: '',
             weight: '',
-            description: ''
+            description: '',
+            value: 'important'
+        })
+    },
+    [onAdd, form]
+    )
+
+    const onInputChange = (e) => {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
         })
     }
 
-    onInputChange = ({ target }) => {
-        this.setState({
-            [target.name]: target.value
-        })
-    }
+        const onChangeValue = (e) => {
+            setForm({
+                ...form,
+                value: e.target.value
+            })
+        }
 
-    render() {
-        const { title, weight, description } = this.state
+        const option = downDropList.map(({ id, name, label }) => {
+            return (
+                <option key={id} value={label}>
+                    {name}
+                </option>
+            );
+        })
+
         return (
-            <div>
-                <form 
-                    className="GoodsListForm" 
-                    onSubmit={this.onFormSubmit}
+            <div className="cell">
+                <form
+                    className="GoodsListForm"
+                    onSubmit={onFormSubmit}
                 >
-                    <input 
-                        className="GoodsListFormInput" 
+                    <input
+                        type="text"
+                        className="GoodsListFormInput"
                         placeholder="Title"
                         name="title"
-                        value={title}
-                        onChange={this.onInputChange}
+                        value={form.title}
+                        onChange={onInputChange}
                     />
-                    <input 
-                        className="GoodsListFormInput" 
+                    <input
+                        type="number"
+                        className="GoodsListFormInput"
                         placeholder="Weight"
                         name="weight"
-                        value={weight}
-                        onChange={this.onInputChange}
+                        value={form.weight}
+                        onChange={onInputChange}
                     />
-                    <input 
-                        className="GoodsListFormInput" 
+                    <input
+                        type="text"
+                        className="GoodsListFormInput"
                         placeholder="Description"
                         name="description"
-                        value={description}
-                        onChange={this.onInputChange}
+                        value={form.description}
+                        onChange={onInputChange}
                     />
+                    <select name="choose" onChange={onChangeValue}>
+                        {option}
+                    </select>
                     <button className="GoodsListFormButton">Add</button>
                 </form>
             </div>
         )
     }
-}
+
+    GoodsListForm.propTypes = {
+        onAdd: PropTypes.func
+    }

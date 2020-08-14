@@ -1,28 +1,26 @@
-import React, { Component } from 'react'
+import React from 'react'
 import GoodsListElement from '../GoodsListElement/GoodsListElement'
 import PropTypes from 'prop-types';
 
-export default class GoodsList extends Component {
-    onDelete = (id) => {
-        this.props.onDelete(id)
-    }
-    
-    render() {
-        const { goods } = this.props
+export default function GoodsList({ goods, onDelete, onCounter, getId}) {
+
+        const element =  Array.isArray(goods) && goods.map( ({ id, ...good }) => {
+            return (
+                <GoodsListElement 
+                    good={good} 
+                    key={id}
+                    onDelete={() => onDelete(id)}
+                    onCounter={() => onCounter(id)}
+                    getId={() => getId(id)}
+                />
+            )
+            })
+
         return (
             <div>
-                {Array.isArray(goods) && goods.map( (good) => {
-                return (
-                    <GoodsListElement 
-                        good={good} 
-                        key={good.id}
-                        onDelete={this.onDelete}
-                    />
-                )
-                })}
+                {element}
             </div>
         )
-    }
 }
 
 GoodsList.defaultProps = {
@@ -30,5 +28,8 @@ GoodsList.defaultProps = {
 }
 
 GoodsList.propTypes = {
-    goods: PropTypes.array
+    goods: PropTypes.array,
+    onDelete: PropTypes.func,
+    onCounter: PropTypes.func,
+    getId: PropTypes.func,
 }
