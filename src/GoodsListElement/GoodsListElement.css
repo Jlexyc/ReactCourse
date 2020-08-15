@@ -16,3 +16,15 @@
 .GoodsListElement_Button{
     width: 12%;
 }
+.GoodsListElement_Button_set{
+    width: 20%;
+}
+
+.selected{
+    background-color: lightskyblue;
+}
+
+.GoodsListElement_Button_set > button {
+    display: inline-block;
+    margin-right: 5px;
+}

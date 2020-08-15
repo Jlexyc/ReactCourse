@@ -1,54 +1,90 @@
-import React, { Component } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import './App.css'
 
 import GoodsList from '../GoodsList/GoodsList'
-import { goods } from '../Mocks/GoodsMock'
+import { goods as goodsMock } from '../Mocks/GoodsMock'
 import GoodsListForm from '../GoodsListForm/GoodsListForm'
-import { addNewItem, removeElementById, getTotal } from '../Utils/goodsUtils'
+import { updateElementByID, deleteCountedElements, addNewItem, removeElementById, getTotal, selectedElementByID, 
+  getTotalCounted } from '../Utils/goodsUtils'
 
-export default class App extends Component {
-  state = {
-    goods,
-    total: getTotal(goods),
-  }
 
-  recalculateTotal = () => {
-    this.setState((state) => ({
-      total: getTotal(state.goods)
-    }))
-  }
+export default function App(props){
 
-  onAdd = (newElement) => {
-    this.setState(({ goods }) => {
-      const newArray = addNewItem(newElement, goods)
-      return {
-        goods: newArray,
-        total: getTotal(newArray),
-    }})
-  }
+  let [goods, setGoods] = useState(goodsMock);    
+  let [total, setTotal] = useState(getTotal(goodsMock));
+  let [totalCounted, setTotalCounted] = useState(getTotalCounted(goodsMock));
+  let [onUpdateID, setOnUpdateID] = useState(''); 
 
-  onDelete = (id) => {
-    const newArray = removeElementById(id, this.state.goods)
-    this.setState({
-      goods: newArray,
-      total: getTotal(newArray),
-    })
-  }
+  const onAdd = useCallback(
+    (newElement) => {
+    const newArray = addNewItem(newElement, goods)
+    setGoods(newArray)
+    setTotal(getTotal(newArray))
+  },[goods])
 
-  render() {
-    const { total, goods } = this.state
+  const onChange = useCallback((id) => {
+    setOnUpdateID(id)
+  })
+
+  const onCanсel = useCallback(() => {
+    setOnUpdateID("")
+  })
+
+  const onSave =  useCallback(
+    (data) => {
+    const newArray = updateElementByID(data, goods)
+    setGoods(newArray)
+    setOnUpdateID("")
+    setTotal(getTotal(newArray))
+    setTotalCounted(getTotalCounted(newArray))
+  },[goods])
+
+  const deleteCounted = useCallback(
+    () => {
+    const newArray = deleteCountedElements(goods)
+    setGoods(newArray)
+    setTotal(getTotal(newArray))
+    setTotalCounted(getTotalCounted(newArray))
+  },[goods])
+
+  const onDelete = useCallback(
+    (id) => {
+      const newArray = removeElementById(id, goods)
+      setGoods(newArray)
+      setTotal(getTotal(newArray))
+      setTotalCounted(getTotalCounted(newArray))
+    }, [goods]
+  )
+
+  const onRawClick = useCallback(
+    (id) => {
+    console.log(id)
+    const newArray = selectedElementByID(id, goods)
+    setGoods(newArray)
+    setTotalCounted(getTotalCounted(newArray))
+  },[goods])
+
     return (
       <div className="Container">
         <div className="Title">Fridge</div>
-        <GoodsList goods={goods} onDelete={this.onDelete}/>
+        <GoodsList goods={goods}
+            onUpdateID={onUpdateID}
+            onDelete={onDelete} 
+            onRawClick={onRawClick} 
+            onChange={onChange}
+            onCanсel={onCanсel}
+            onSave={onSave}/>
         <div className="Total">
           <div>Total:</div>
           <div>{total}</div>
+          <div>Total counted:</div>
+          <div>{totalCounted}</div>
+          <div><button onClick={deleteCounted}>Delete counted</button></div>
           <div/>
         </div>
-        <GoodsListForm onAdd={this.onAdd}/>
+        <GoodsListForm onAdd={onAdd}/>
       </div>
     )
-  }
+  // }
 }
