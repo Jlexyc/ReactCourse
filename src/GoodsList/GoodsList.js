@@ -1,10 +1,35 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import GoodsListElement from '../GoodsListElement/GoodsListElement';
 import PropTypes from 'prop-types';
+import { shallowEqual, useSelector, useDispatch } from 'react-redux'
+import * as goodsActions from  '../Store/actions/goodsActions'
 
 export default function GoodsList(props) {
 
-    const { goods, categories, selectedItems, onElementToggle, onElementUpdate, onDelete } = props;
+    const { onElementToggle, onElementUpdate, onDelete } = props;
+
+    const dispatch = useDispatch()
+
+    const goods = useSelector(state => {
+      console.log(state)
+      return state.goods.list
+    }, shallowEqual)
+    const categories = useSelector(state => state.categories.list, shallowEqual)
+    const selectedItems = useSelector(state => state.goods.selectedList, shallowEqual)
+
+    const toggleItem = useCallback(
+      (id) => {
+         dispatch(goodsActions.selectItem(id))
+      }
+      ,[dispatch, goodsActions]
+    )
+
+    const deleteItem = useCallback(
+      (id) => {
+         dispatch(goodsActions.deleteItem(id))
+      }
+      ,[dispatch, goodsActions]
+    )
 
     return (
         <div>
@@ -17,8 +42,8 @@ export default function GoodsList(props) {
               key={ item.id }
               selected={ selected }
               onSave={ onElementUpdate }
-              onDelete={ onDelete }
-              onToggle={ onElementToggle }
+              onDelete={ deleteItem }
+              onToggle={ toggleItem }
             />
           );
         })}

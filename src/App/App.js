@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react'
+import { shallowEqual, useSelector } from 'react-redux'
 
 import './App.css'
 
@@ -7,8 +8,8 @@ import { goods as goodsMock } from '../Mocks/GoodsMock';
 import GoodsListForm from '../GoodsListForm/GoodsListForm';
 import { addNewItem, removeElementById, getTotal, getGoodsBySelected }
   from '../Utils/goodsUtils';
-import {categories} from '../Mocks/CategoriesMock';
 import __ from '../Utils/translationsUtils';
+import { categories } from '../Mocks/CategoriesMock'
 
 export default function App(props) {
 
@@ -16,6 +17,8 @@ export default function App(props) {
     const [total, setTotal] = useState(getTotal(goodsMock));
     const [subTotal, setSubtotal] = useState(0);
     const [selectedGoods, setSelectedGoods] = useState([]);
+
+    const reduxTotal = useSelector(state => state.goods.total)
 
     const onDelete = useCallback(
         (id) => {
@@ -35,15 +38,6 @@ export default function App(props) {
             setTotal(getTotal(deselectedGoods))
         }
         ,[goods, selectedGoods]
-    )
-
-    const onAdd = useCallback(
-        (newElement) => {
-            const newArray = addNewItem(newElement, goods);
-            setGoods(goods)
-            setTotal(getTotal(newArray))
-          }
-        ,[goods]
     )
 
     const onElementToggle = useCallback(
@@ -83,8 +77,6 @@ export default function App(props) {
         <div className="Container">
         <div className="Title">{ __('Fridge') }</div>
         <GoodsList
-          goods={ goods }
-          categories={ categories }
           selectedItems={ selectedGoods }
           onDelete={ onDelete }
           onElementToggle={ onElementToggle }
@@ -92,7 +84,7 @@ export default function App(props) {
         />
         <div className="Total">
           <div>{__('Total')}:</div>
-          <div>{total}</div>
+          <div>{reduxTotal}</div>
           <div>{
             selectedGoods.length > 0 && `${ __('SubTotal') }: ${subTotal}`
           }</div>
@@ -102,7 +94,7 @@ export default function App(props) {
             { __('Delete Selected') }
           </button>
         ) }
-        <GoodsListForm onAdd={onAdd} categories={ categories } />
+        <GoodsListForm />
       </div>
     )
 }

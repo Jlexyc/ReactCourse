@@ -1,37 +1,29 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux'
 import './GoodsListForm.css';
 import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux'
+
 import CategorySelect from '../CategoriesSelect/CategorySelect';
 import __ from '../Utils/translationsUtils';
 import { validateNumericInput } from '../Utils/goodsUtils';
+import * as formActions from '../Store/actions/formActions';
+import * as goodsActions from '../Store/actions/goodsActions';
 
-export default class GoodsListForm extends Component {
+
+class GoodsListForm extends Component {
   constructor(props) {
     super(props);
-    const categoryDefault = props.categories ?
-      props.categories[0].slug : 'uncategorized';
-
-    this.state = {
-      title: '',
-      weight: '',
-      description: '',
-      category: categoryDefault,
-    };
-
+    
     this.onFormSubmit = (e) => {
       e.preventDefault();
-      this.props.onAdd(this.state);
-      this.setState({
-        title: '',
-        weight: '',
-        description: '',
-      });
+      this.props.goodsActions.addItem(this.props.form)
     };
 
     this.onInputChange = ({target}) => {
-      this.setState({
+      this.props.formActions.updateForm({
         [target.name]: target.value,
-      });
+      })
     };
 
     this.onWeightChange = ({ target }) => {
@@ -39,15 +31,15 @@ export default class GoodsListForm extends Component {
       if (!validateNumericInput(value)) {
         return;
       }
-
-      this.setState({
+      this.props.formActions.updateForm({
         [target.name]: value,
-      });
+      })
     };
   }
 
   render() {
-    const {title, weight, description} = this.state;
+    console.log('this.props: ', this.props)
+    const {title, weight, description} = this.props.form;
     return (
       <div>
         <form
@@ -91,7 +83,24 @@ export default class GoodsListForm extends Component {
   }
 }
 
+const mapStateToProps = state => {
+  console.log('REDUX STATE: ', state)
+  return {
+    form: state.form,
+    categories: state.categories.list,
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    formActions: bindActionCreators(formActions, dispatch),
+    goodsActions: bindActionCreators(goodsActions, dispatch),
+  }
+}
+
 GoodsListForm.propTypes = {
   onAdd: PropTypes.func,
   categories: PropTypes.array,
 };
+
+export default connect(mapStateToProps, mapDispatchToProps)(GoodsListForm)
