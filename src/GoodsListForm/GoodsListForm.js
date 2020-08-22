@@ -1,106 +1,106 @@
-import React, {Component} from 'react';
-import { connect } from 'react-redux'
+import React, { useState, useCallback } from 'react';
+import { connect } from 'react-redux';
 import './GoodsListForm.css';
 import PropTypes from 'prop-types';
-import { bindActionCreators } from 'redux'
-
-import CategorySelect from '../CategoriesSelect/CategorySelect';
+import CategorySelect from '../CategorySelect/CategorySelect';
 import __ from '../Utils/translationsUtils';
 import { validateNumericInput } from '../Utils/goodsUtils';
-import * as formActions from '../Store/actions/formActions';
-import * as goodsActions from '../Store/actions/goodsActions';
+import { addItem } from '../Store/Actions/goodsListFormActions';
 
+const GoodsListForm = (props) => {
+  const categoryDefault = props.defaultCategory;
 
-class GoodsListForm extends Component {
-  constructor(props) {
-    super(props);
-    
-    this.onFormSubmit = (e) => {
-      e.preventDefault();
-      this.props.goodsActions.addItem(this.props.form)
-    };
+  const [title, setTitle] = useState('');
+  const [weight, setWeight] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState(categoryDefault);
+  const { addItem } = props;
 
-    this.onInputChange = ({target}) => {
-      this.props.formActions.updateForm({
-        [target.name]: target.value,
-      })
-    };
+  const onFormSubmit = useCallback((e) => {
+    e.preventDefault();
+    addItem({ title, weight, description, category });
+    setTitle('');
+    setWeight('');
+    setDescription('');
+  }, [title, weight, description, category, addItem]);
 
-    this.onWeightChange = ({ target }) => {
-      const value = target.value.replace(',', '.');
-      if (!validateNumericInput(value)) {
-        return;
-      }
-      this.props.formActions.updateForm({
-        [target.name]: value,
-      })
-    };
-  }
+  const onInputChange = useCallback(({target}) => {
+    let setter;
+    switch (target.name) {
+      case 'title':
+        setter = setTitle;
+        break;
+      case 'description':
+        setter = setDescription;
+        break;
+      case 'category':
+        setter = setCategory;
+        break;
+      default:
+        break;
+    }
 
-  render() {
-    console.log('this.props: ', this.props)
-    const {title, weight, description} = this.props.form;
-    return (
-      <div>
-        <form
-          className="GoodsListForm"
-          onSubmit={this.onFormSubmit}
-        >
-          <input
-            type="text"
-            className="GoodsListFormInput"
-            placeholder={ __('Title') }
-            name="title"
-            value={title}
-            onChange={this.onInputChange}
-          />
-          <input
-            type="number"
-            className="GoodsListFormInput"
-            placeholder={ __('Weight') }
-            name="weight"
-            value={weight}
-            onChange={this.onWeightChange}
-          />
-          <input
-            type="text"
-            className="GoodsListFormInput"
-            placeholder={ __('Description') }
-            name="description"
-            value={description}
-            onChange={this.onInputChange}
-          />
+    if (typeof setter !== 'function') return;
+    setter(target.value);
+  }, []);
 
-          <CategorySelect
-            onChange={ this.onInputChange }
-            categories={ this.props.categories }
-          />
+  const onWeightChange = useCallback(({ target }) => {
+    const value = target.value.replace(',', '.');
 
-          <button className="GoodsListFormButton">{ __('Add') }</button>
-        </form>
-      </div>
-    );
-  }
-}
+    if (!validateNumericInput(value)) {
+      return;
+    }
 
-const mapStateToProps = state => {
-  console.log('REDUX STATE: ', state)
-  return {
-    form: state.form,
-    categories: state.categories.list,
-  }
-}
+    setWeight(value);
+  }, []);
 
-const mapDispatchToProps = dispatch => {
-  return {
-    formActions: bindActionCreators(formActions, dispatch),
-    goodsActions: bindActionCreators(goodsActions, dispatch),
-  }
-}
+  return (
+    <div>
+      <form
+        className="GoodsListForm"
+        onSubmit={ onFormSubmit }
+      >
+        <input
+          type="text"
+          className="GoodsListFormInput"
+          placeholder={ __('Title') }
+          name="title"
+          value={ title }
+          onChange={ onInputChange }
+        />
+        <input
+          type="number"
+          className="GoodsListFormInput"
+          placeholder={ __('Weight') }
+          name="weight"
+          value={ weight }
+          onChange={ onWeightChange }
+        />
+        <input
+          type="text"
+          className="GoodsListFormInput"
+          placeholder={ __('Description') }
+          name="description"
+          value={ description }
+          onChange={ onInputChange }
+        />
 
-GoodsListForm.propTypes = {
-  onAdd: PropTypes.func,
-  categories: PropTypes.array,
+        <CategorySelect
+          onChange={ onInputChange }
+          defaultValue={ category }
+          categories={ props.categories }
+        />
+
+        <button className="GoodsListFormButton">{ __('Add') }</button>
+      </form>
+    </div>
+  );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(GoodsListForm)
+GoodsListForm.propTypes = {
+  addItem: PropTypes.func,
+  categories: PropTypes.array,
+  defaultCategory: PropTypes.string,
+};
+
+export default connect(null, { addItem })(GoodsListForm);

@@ -1,67 +1,47 @@
-import React, { useCallback } from 'react'
-import GoodsListElement from '../GoodsListElement/GoodsListElement';
+import React, { useEffect } from 'react';
+import { connect, useSelector, useDispatch, shallowEqual } from 'react-redux';
 import PropTypes from 'prop-types';
-import { shallowEqual, useSelector, useDispatch } from 'react-redux'
-import * as goodsActions from  '../Store/actions/goodsActions'
+import GoodsListElement from '../GoodsListElement/GoodsListElement';
+import { getGoods } from '../Resources/goods'
+import * as actions from '../Store/Actions/goodsListElementActions';
 
-export default function GoodsList(props) {
+const GoodsList = (props) => {
+  const goods = useSelector(state => state.goods, shallowEqual)
+  const selectedItems = useSelector(state => state.selectedItems, shallowEqual)
 
-    const { onElementToggle, onElementUpdate, onDelete } = props;
+  const dispatch = useDispatch()
 
-    const dispatch = useDispatch()
+  useEffect(() => {
+    getGoods().then(res => {
+      dispatch(actions.getGoods(res))
+    })
+  }, [])
 
-    const goods = useSelector(state => {
-      console.log(state)
-      return state.goods.list
-    }, shallowEqual)
-    const categories = useSelector(state => state.categories.list, shallowEqual)
-    const selectedItems = useSelector(state => state.goods.selectedList, shallowEqual)
-
-    const toggleItem = useCallback(
-      (id) => {
-         dispatch(goodsActions.selectItem(id))
-      }
-      ,[dispatch, goodsActions]
-    )
-
-    const deleteItem = useCallback(
-      (id) => {
-         dispatch(goodsActions.deleteItem(id))
-      }
-      ,[dispatch, goodsActions]
-    )
-
-    return (
-        <div>
-        {Array.isArray(goods) && goods.map( (item) => {
-          const selected = selectedItems.indexOf(item.id) >= 0;
-          return (
-            <GoodsListElement
-              item={ item }
-              categories={ categories }
-              key={ item.id }
-              selected={ selected }
-              onSave={ onElementUpdate }
-              onDelete={ deleteItem }
-              onToggle={ toggleItem }
-            />
-          );
-        })}
-      </div>
-    )
-}
+  return (
+    <div>
+      { goods.map((item) => {
+        const selected = selectedItems.indexOf(item.id) >= 0;
+        return (
+          <GoodsListElement
+            item={ item }
+            key={ item.id }
+            selected={ selected }
+          />
+        );
+      }) }
+    </div>
+  );
+};
 
 GoodsList.defaultProps = {
-    goods: [],
-    selectedItems: [],
-  };
-  
-GoodsList.propTypes = {
-    goods: PropTypes.array,
-    categories: PropTypes.array,
-    selectedItems: PropTypes.array,
-    onDelete: PropTypes.func,
-    onElementToggle: PropTypes.func,
-    onElementUpdate: PropTypes.func,
+  goods: [],
+  selectedItems: [],
 };
-  
+
+GoodsList.propTypes = {
+  goods: PropTypes.array,
+  selectedItems: PropTypes.array,
+};
+
+export default GoodsList
+
