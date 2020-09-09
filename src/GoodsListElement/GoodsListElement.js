@@ -5,7 +5,7 @@ import CategorySelect from '../CategorySelect/CategorySelect';
 import { getCategory } from '../Utils/categoriesUtils';
 import __ from '../Utils/translationsUtils';
 import { validateNumericInput } from '../Utils/goodsUtils';
-import * as actions from '../Store/Actions/goodsListElementActions';
+import * as actions from '../Store/actions/goodsListElementActions';
 import './GoodsListElement.css';
 import { removeItem } from '../Resources/goods'
 

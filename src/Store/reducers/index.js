@@ -8,18 +8,39 @@ const initialState = {
   categories,
   defaultCategory: 'uncategorized',
   total: 0,
-  subTotal: 0,
+  subtotal: 0,
+  getGoodsLoading: null,
+  getGoodsError: null,
 };
 
 const reducer = (state = initialState, action) => {
-  console.log('ACTION: ', action)
   switch (action.type) {
-    case 'GET_GOODS_SUCCESS': {
+    case 'GET_GOODS': {
       return {
         ...state,
-        goods: action.list,
-        total: getTotal(action.list),
-        subTotal: getTotal(getGoodsBySelected(action.list, state.selectedItems)),
+        goods: action.subtype === 'success' ? action.list : state.goods,
+        total: action.subtype === 'success' ? action.total : state.total,
+        subtotal: action.subtype === 'success' ? action.subtotal : state.subtotal,
+        getGoodsLoading: action.subtype === 'loading',
+        getGoodsError: action.subtype === 'error' ? action.error : null
+      }
+    }
+    case 'ADD_ITEM': {
+      return {
+        ...state,
+        goods: action.subtype === 'success' ? action.list : state.goods,
+        total: action.subtype === 'success' ? action.total : state.total,
+        addItemLoading: action.subtype === 'loading',
+        getGoodsLoading: action.subtype === 'loading',
+        addItemError: action.subtype === 'error' ? action.error : null
+      }
+    }
+    case 'DELETE_SELECTED': {
+      return {
+        ...state,
+        addItemLoading: action.subtype === 'loading',
+        deleteItemsLoading: action.subtype === 'loading',
+        deleteItemsError: action.subtype === 'error' ? action.error : null
       }
     }
     case 'SET_ITEM_SELECTED': {
@@ -30,7 +51,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         selectedItems: newSelectedItems,
-        subTotal: getTotal(getGoodsBySelected(state.goods, newSelectedItems)),
+        subtotal: getTotal(getGoodsBySelected(state.goods, newSelectedItems)),
       };
     }
     case 'UNSET_ITEM_SELECTED': {
@@ -41,7 +62,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         selectedItems: newSelectedItems,
-        subTotal: getTotal(getGoodsBySelected(state.goods, newSelectedItems)),
+        subtotal: getTotal(getGoodsBySelected(state.goods, newSelectedItems)),
       };
     }
     case 'DELETE_ITEM': {
@@ -57,7 +78,7 @@ const reducer = (state = initialState, action) => {
         goods: newGoods,
         selectedItems: newSelectedItems,
         total: getTotal(newGoods),
-        subTotal: getTotal(getGoodsBySelected(newGoods, newSelectedItems)),
+        subtotal: getTotal(getGoodsBySelected(newGoods, newSelectedItems)),
       };
     }
     case 'UPDATE_ITEM': {
@@ -69,32 +90,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         goods: newGoods,
         total: getTotal(newGoods),
-        subTotal: getTotal(getGoodsBySelected(newGoods, state.selectedItems)),
-      };
-    }
-    case 'ADD_ITEM': {
-      const newGoods = [
-        ...state.goods,
-        action.item,
-      ];
-      return {
-        ...state,
-        goods: newGoods,
-        total: getTotal(newGoods),
-      };
-    }
-    case 'DELETE_SELECTED': {
-      const newGoods = getGoodsBySelected(
-          state.goods,
-          state.selectedItems,
-          false,
-      );
-      return {
-        ...state,
-        goods: newGoods,
-        selectedItems: [],
-        total: getTotal(newGoods),
-        subTotal: 0,
+        subtotal: getTotal(getGoodsBySelected(newGoods, state.selectedItems)),
       };
     }
     default:

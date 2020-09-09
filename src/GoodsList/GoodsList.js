@@ -1,24 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect, useSelector, useDispatch, shallowEqual } from 'react-redux';
 import PropTypes from 'prop-types';
 import GoodsListElement from '../GoodsListElement/GoodsListElement';
 import { getGoods } from '../Resources/goods'
-import * as actions from '../Store/Actions/goodsListElementActions';
+import * as actions from '../Store/actions/goodsListElementActions';
 
 const GoodsList = (props) => {
   const goods = useSelector(state => state.goods, shallowEqual)
   const selectedItems = useSelector(state => state.selectedItems, shallowEqual)
 
+  const error = useSelector(state => state.getGoodsError)
+  const isLoading = useSelector(state => state.getGoodsLoading)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    getGoods().then(res => {
-      dispatch(actions.getGoods(res))
-    })
+    dispatch(actions.getGoods())
   }, [])
 
   return (
     <div>
+      { isLoading && <div>...loading</div>}
       { goods.map((item) => {
         const selected = selectedItems.indexOf(item.id) >= 0;
         return (
@@ -29,6 +30,7 @@ const GoodsList = (props) => {
           />
         );
       }) }
+      {error && <div>ERROR: {error}</div>}
     </div>
   );
 };

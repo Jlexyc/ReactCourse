@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import CategorySelect from '../CategorySelect/CategorySelect';
 import __ from '../Utils/translationsUtils';
 import { validateNumericInput } from '../Utils/goodsUtils';
-import { addItem } from '../Store/Actions/goodsListFormActions';
+import { addItem } from '../Store/actions/goodsListFormActions';
 
 const GoodsListForm = (props) => {
   const categoryDefault = props.defaultCategory;
@@ -14,7 +14,7 @@ const GoodsListForm = (props) => {
   const [weight, setWeight] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState(categoryDefault);
-  const { addItem } = props;
+  const { addItem, isLoading } = props;
 
   const onFormSubmit = useCallback((e) => {
     e.preventDefault();
@@ -91,7 +91,7 @@ const GoodsListForm = (props) => {
           categories={ props.categories }
         />
 
-        <button className="GoodsListFormButton">{ __('Add') }</button>
+        {!isLoading && <button className="GoodsListFormButton">{ __('Add') }</button>}
       </form>
     </div>
   );
@@ -103,4 +103,11 @@ GoodsListForm.propTypes = {
   defaultCategory: PropTypes.string,
 };
 
-export default connect(null, { addItem })(GoodsListForm);
+const mapStateToProps = (state) => {
+  return {
+    isLoading: state.addItemLoading,
+    error: state.addItemError
+  }
+}
+
+export default connect(mapStateToProps, { addItem })(GoodsListForm);
