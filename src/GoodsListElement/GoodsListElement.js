@@ -8,6 +8,7 @@ import { validateNumericInput } from '../Utils/goodsUtils';
 import * as actions from '../Store/actions/goodsListElementActions';
 import './GoodsListElement.css';
 import { removeItem } from '../Resources/goods'
+import { useHistory } from 'react-router-dom';
 
 const GoodsListElement = (props) => {
   const { item, updateItem, deleteItem, setItemSelected, unsetItemSelected,
@@ -21,9 +22,11 @@ const GoodsListElement = (props) => {
 
   const toggleFunc = selected ? unsetItemSelected : setItemSelected;
 
+  const history = useHistory()
+
   const onElementEdit = useCallback((e) => {
     e.stopPropagation();
-    setEditing(true);
+    history.push('/create/' + id)
   }, []);
 
   const onInputChange = useCallback(({ target }) => {
@@ -93,11 +96,7 @@ const GoodsListElement = (props) => {
   }, [editing, toggleFunc, id]);
 
   const onRowAction = useCallback((e) => {
-    if (editing) {
-      onElementSave(e);
-    } else {
       onElementEdit(e);
-    }
   }, [editing, onElementSave, onElementEdit]);
 
   const elementClassName = selected ?

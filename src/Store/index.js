@@ -9,6 +9,15 @@ const logger = store => next => action => {
     return result
   }
 
-const store = createStore(reducer, applyMiddleware(thunk, logger));
+const localThunk = store => next => action => {
+    if( typeof action === 'function') {
+      action(store.dispatch, store.getState)
+    } else {
+      return next(action)
+    }
+  }
+
+
+const store = createStore(reducer, applyMiddleware(localThunk, logger));
 
 export { store };
