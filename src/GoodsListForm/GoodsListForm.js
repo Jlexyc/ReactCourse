@@ -1,62 +1,101 @@
-import React, { Component } from 'react'
-import './GoodsListForm.css'
+import React, { useCallback } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
-export default class GoodsListForm extends Component {
+import './GoodsListForm.css';
 
-    state = {
-        title: '',
-        weight: '',
-        description: ''
-    }
+import * as formActions from '../Store/actions/formActions';
+import * as goodsActions from '../Store/actions/goodsActions';
 
-    onFormSubmit = (e) => {
-        e.preventDefault()
-        this.props.onAdd(this.state)
-        this.setState({
-            title: '',
-            weight: '',
-            description: ''
+const GoodsListForm = (props) => {
+
+    const { title, weight, description } = props.form;
+
+    const onFormSubmit = useCallback(
+        (e) => {
+            e.preventDefault()
+            if (weight === '') {
+                alert('you have to put a number in cell description ')
+                return props.formActions.clearForm()
+            }
+            props.goodsActions.addItem(props.form)
+        },
+        [props.form, props.formActions, props.goodsActions, weight]
+    )
+
+    const onInputChange = (e) => {
+        props.formActions.updateForm({
+            [e.target.name]: e.target.value
         })
     }
 
-    onInputChange = ({ target }) => {
-        this.setState({
-            [target.name]: target.value
+    const onChangeValue = (e) => {
+        props.formActions.updateForm({
+            value: e.target.value
         })
     }
 
-    render() {
-        const { title, weight, description } = this.state
+    const option = props.downDropList.map(({ id, name, label }) => {
         return (
-            <div>
-                <form 
-                    className="GoodsListForm" 
-                    onSubmit={this.onFormSubmit}
-                >
-                    <input 
-                        className="GoodsListFormInput" 
-                        placeholder="Title"
-                        name="title"
-                        value={title}
-                        onChange={this.onInputChange}
-                    />
-                    <input 
-                        className="GoodsListFormInput" 
-                        placeholder="Weight"
-                        name="weight"
-                        value={weight}
-                        onChange={this.onInputChange}
-                    />
-                    <input 
-                        className="GoodsListFormInput" 
-                        placeholder="Description"
-                        name="description"
-                        value={description}
-                        onChange={this.onInputChange}
-                    />
-                    <button className="GoodsListFormButton">Add</button>
-                </form>
-            </div>
-        )
+            <option key={id} value={label}>
+                {name}
+            </option>
+        );
+    })
+
+    return (
+        <div className="cell">
+            <form
+                className="GoodsListForm"
+                onSubmit={onFormSubmit}
+            >
+                <input
+                    type="text"
+                    className="GoodsListFormInput"
+                    placeholder="Title"
+                    name="title"
+                    value={title}
+                    onChange={onInputChange}
+                />
+                <input
+                    type="number"
+                    className="GoodsListFormInput"
+                    placeholder="Weight"
+                    name="weight"
+                    value={weight}
+                    onChange={onInputChange}
+                />
+                <input
+                    type="text"
+                    className="GoodsListFormInput"
+                    placeholder="Description"
+                    name="description"
+                    value={description}
+                    onChange={onInputChange}
+                />
+                <select name="choose" onChange={onChangeValue}>
+                    {option}
+                </select>
+                <button className="GoodsListFormButton">Add</button>
+            </form>
+        </div>
+    )
+}
+
+const mapStateToProps = state => {
+    return {
+        form: state.form,
+        downDropList: state.downDropList.downDropList,
     }
 }
+
+const mapDispatchToProps = dispatch => {
+    return {
+        formActions: bindActionCreators(formActions, dispatch),
+        goodsActions: bindActionCreators(goodsActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(GoodsListForm)
+
+

@@ -1,54 +1,38 @@
-import React, { Component } from 'react'
+import React, { useCallback } from 'react'
+import { useDispatch } from 'react-redux';
 
 import './App.css'
 
 import GoodsList from '../GoodsList/GoodsList'
-import { goods } from '../Mocks/GoodsMock'
 import GoodsListForm from '../GoodsListForm/GoodsListForm'
-import { addNewItem, removeElementById, getTotal } from '../Utils/goodsUtils'
+import Counter from '../Counter/Counter'
+import GoodsChangeForm from '../GoodsChangeForm/GoodsChangeForm';
+import * as goodsActions from '../Store/actions/goodsActions';
 
-export default class App extends Component {
-  state = {
-    goods,
-    total: getTotal(goods),
-  }
+export default function App() {
 
-  recalculateTotal = () => {
-    this.setState((state) => ({
-      total: getTotal(state.goods)
-    }))
-  }
+  const dispatch = useDispatch();
 
-  onAdd = (newElement) => {
-    this.setState(({ goods }) => {
-      const newArray = addNewItem(newElement, goods)
-      return {
-        goods: newArray,
-        total: getTotal(newArray),
-    }})
-  }
+  const deletingSelectedItems = useCallback(
+    () => {
+      dispatch(goodsActions.deletingSelectedItems())
+    },
+    [dispatch],
+  )
 
-  onDelete = (id) => {
-    const newArray = removeElementById(id, this.state.goods)
-    this.setState({
-      goods: newArray,
-      total: getTotal(newArray),
-    })
-  }
-
-  render() {
-    const { total, goods } = this.state
-    return (
-      <div className="Container">
-        <div className="Title">Fridge</div>
-        <GoodsList goods={goods} onDelete={this.onDelete}/>
-        <div className="Total">
-          <div>Total:</div>
-          <div>{total}</div>
-          <div/>
-        </div>
-        <GoodsListForm onAdd={this.onAdd}/>
+  return (
+    <div className="Container">
+      <div className="Title">Fridge</div>
+      <GoodsList />
+      <Counter />
+      <div className="cartForm">
+        <GoodsListForm />
+        <GoodsChangeForm />
       </div>
-    )
-  }
+      <div>
+        <h3>THIS BUTTON DELETE ALL PRODUCT THEN YOU HAVE MARKED </h3>
+        <button className="allDelete" onClick={() => deletingSelectedItems()}>delete</button>
+      </div>
+    </div>
+  )
 }

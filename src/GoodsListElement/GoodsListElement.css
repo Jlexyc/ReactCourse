@@ -5,14 +5,28 @@
     flex-direction: row;
     justify-content: space-between;
 }
+
+.important {
+    background-color: aqua;
+}
+
 .GoodsListElement_Column {
     text-align: left;
-    width: 8%;
+    width: 10%;
 }
 .GoodsListElement_ColumnDescription{
-    width: 30%;
+    width: 25%;
 }
 
 .GoodsListElement_Button{
     width: 12%;
+}
+
+.onDoubleClick {
+    cursor: pointer;
+    user-select: none;
+}
+
+h2 {
+    margin: 0;
 }
