@@ -1,23 +1,24 @@
-import { createStore, applyMiddleware } from 'redux';
+import { applyMiddleware, createStore, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
-import reducer from './reducers';
+import authReducer from './reducers/authReducer';
+import productsReducer from './reducers/productsReducer';
 
-const logger = store => next => action => {
-    console.log('dispatching', action)
-    let result = next(action)
-    console.log('next state', store.getState())
-    return result
-  }
-
-const localThunk = store => next => action => {
-    if( typeof action === 'function') {
-      action(store.dispatch, store.getState)
-    } else {
-      return next(action)
+function logger({ getState }) {
+    return next => action => {
+      console.log('ACTION ', action)
+  
+      // Call the next dispatch method in the middleware chain.
+      const returnValue = next(action)
+  
+      console.log('NEW STATE', getState())
+  
+      // This will likely be the action itself, unless
+      // a middleware further in chain changed it.
+      return returnValue
     }
   }
 
-
-const store = createStore(reducer, applyMiddleware(localThunk, logger));
-
-export { store };
+export default createStore(
+    combineReducers({ auth: authReducer, products: productsReducer }),
+    applyMiddleware(logger, thunk)
+)
